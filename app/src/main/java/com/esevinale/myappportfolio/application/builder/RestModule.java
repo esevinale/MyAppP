@@ -20,13 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class RestModule {
 
-    public static final int CONNECT_TIMEOUT = 30000;
-
-//    @Provides
-//    @Singleton
-//    Interceptor requestInterceptor(ApiKeyInterceptor interceptor) {
-//        return interceptor;
-//    }
+    public static final int CONNECT_TIMEOUT = 15000;
 
     @Provides
     @Singleton

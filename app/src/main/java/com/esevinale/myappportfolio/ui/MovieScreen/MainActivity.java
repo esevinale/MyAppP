@@ -2,6 +2,7 @@ package com.esevinale.myappportfolio.ui.MovieScreen;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -29,5 +30,6 @@ public class MainActivity extends BaseActivity implements MainView{
     @Override
     public void setContent() {
         setContent(new MovieListFragment());
+        Log.d("myLogs", "setContent: ");
     }
 }
