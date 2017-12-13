@@ -1,6 +1,7 @@
 package com.esevinale.myappportfolio.application.builder;
 
-import com.esevinale.myappportfolio.utils.MyFragmentManager;
+import com.esevinale.myappportfolio.utils.manager.MyFragmentManager;
+import com.esevinale.myappportfolio.utils.manager.NetworkManager;
 
 import javax.inject.Singleton;
 
@@ -14,5 +15,11 @@ public class ManagerModule {
     @Provides
     MyFragmentManager provideMyFragmentManager() {
         return new MyFragmentManager();
+    }
+
+    @Singleton
+    @Provides
+    NetworkManager provideNetworkManager() {
+        return new NetworkManager();
     }
 }

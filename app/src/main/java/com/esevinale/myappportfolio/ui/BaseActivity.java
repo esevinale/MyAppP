@@ -1,24 +1,30 @@
 package com.esevinale.myappportfolio.ui;
 
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.esevinale.myappportfolio.R;
 import com.esevinale.myappportfolio.application.AppController;
-import com.esevinale.myappportfolio.application.builder.AppComponent;
-import com.esevinale.myappportfolio.utils.MyFragmentManager;
+import com.esevinale.myappportfolio.utils.manager.MyFragmentManager;
 
 import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public abstract class BaseActivity extends MvpAppCompatActivity{
 
     @Inject
     MyFragmentManager myFragmentManager;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.progress_bar)
+    protected ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +33,16 @@ public abstract class BaseActivity extends MvpAppCompatActivity{
         AppController.getAppComponent().inject(this);
         setContentView(R.layout.activity_base);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
 
         FrameLayout parent = findViewById(R.id.main_wrapper);
         getLayoutInflater().inflate(getMainContentLayout(), parent);
+    }
+
+    public ProgressBar getmProgressBar() {
+        return mProgressBar;
     }
 
     @LayoutRes

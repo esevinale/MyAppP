@@ -2,8 +2,6 @@ package com.esevinale.myappportfolio.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.IntRange;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -31,4 +29,8 @@ public abstract class BaseFragment extends MvpAppCompatFragment {
 
     @StringRes
     public abstract int onCreateToolbarTitle();
+
+    public BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
+    }
 }

@@ -4,50 +4,46 @@ package com.esevinale.myappportfolio.ui.MovieScreen;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.esevinale.myappportfolio.R;
-import com.esevinale.myappportfolio.api.ApiConstants;
 import com.esevinale.myappportfolio.api.TmdbService;
 import com.esevinale.myappportfolio.application.AppController;
-import com.esevinale.myappportfolio.models.Full;
-import com.esevinale.myappportfolio.models.FullMovie;
-import com.esevinale.myappportfolio.models.Movie;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.ui.BaseFragment;
+import com.esevinale.myappportfolio.utils.manager.MyGridLayoutManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.SingleObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-public class MovieListFragment extends BaseFragment implements MovieListView{
+public class MovieListFragment extends BaseFragment implements MovieListView {
 
     @Inject
     TmdbService tmdbService;
 
+    @BindView(R.id.rv_movie)
     RecyclerView mRecyclerView;
+
+    @BindView(R.id.movie_swipe)
+    protected SwipeRefreshLayout mSwipe;
+    protected ProgressBar mProgressBar;
+
+    @InjectPresenter
+    MovieListPresenter movieListPresenter;
+
     MovieListAdapter movieListAdapter;
+    private Unbinder unbinder;
 
     public MovieListFragment() {
         // Required empty public constructor
@@ -63,29 +59,16 @@ public class MovieListFragment extends BaseFragment implements MovieListView{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setUpRecyclerView(view);
+        unbinder = ButterKnife.bind(this, view);
+        setUpSwipeToRefreshLayout();
+        setUpRecyclerView();
         setUpAdapter(mRecyclerView);
+        movieListPresenter.loadStart();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        tmdbService.getLatestMovie()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Response<Full>>() {
-                    @Override
-                    public void accept(Response<Full> fullResponse) throws Exception {
-                        Log.d("myLogs", "REQUEST: " + fullResponse.raw().request().url().toString());
-
-                        List<MovieItem> movies = new ArrayList<>();
-                        for (MovieItem movie : fullResponse.body().getResults())
-                            movies.add(movie);
-
-                        movieListAdapter.setMovies(movies);
-                    }
-                });
     }
 
     @Override
@@ -98,9 +81,18 @@ public class MovieListFragment extends BaseFragment implements MovieListView{
         return R.string.movie_screen_name;
     }
 
-    private void setUpRecyclerView (View rootView) {
-        mRecyclerView = rootView.findViewById(R.id.rv_movie);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+    private void setUpRecyclerView() {
+        MyGridLayoutManager myGridLayoutManager = new MyGridLayoutManager(getActivity(), 2);
+        mRecyclerView.setLayoutManager(myGridLayoutManager);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (myGridLayoutManager.isOnNextPagePosition())
+                    movieListPresenter.loadNext((movieListAdapter.getItemCount()/20) + 1);
+            }
+        });
+
+        ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
     }
 
     private void setUpAdapter(RecyclerView recyclerView) {
@@ -108,19 +100,51 @@ public class MovieListFragment extends BaseFragment implements MovieListView{
         recyclerView.setAdapter(movieListAdapter);
     }
 
+    private void setUpSwipeToRefreshLayout() {
+        mSwipe.setOnRefreshListener(() -> movieListPresenter.loadRefresh());
+        mSwipe.setColorSchemeResources(R.color.colorAccent);
+        mProgressBar = getBaseActivity().getmProgressBar();
+    }
+
     @Override
-    public void showMovies(List<MovieItem> movies) {
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @Override
+    public void showRefreshing() {
 
     }
 
     @Override
-    public void loadingStarted() {
-
+    public void hideRefreshing() {
+        mSwipe.setRefreshing(false);
     }
 
     @Override
-    public void loadingFailed(String errorMessage) {
+    public void showListProgress() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
 
+    @Override
+    public void hideListProgress() {
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showError(String message) {
+        Toast.makeText(getBaseActivity(), message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void setMovies(List<MovieItem> movies) {
+        movieListAdapter.setMovies(movies);
+    }
+
+    @Override
+    public void addMovies(List<MovieItem> movies) {
+        movieListAdapter.addMovies(movies);
     }
 
     @Override

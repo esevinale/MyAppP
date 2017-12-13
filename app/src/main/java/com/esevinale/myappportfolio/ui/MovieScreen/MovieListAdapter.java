@@ -2,7 +2,6 @@ package com.esevinale.myappportfolio.ui.MovieScreen;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +39,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     public void onBindViewHolder(MovieListAdapter.ViewHolder holder, int position) {
         holder.itemView.setOnClickListener(holder);
         holder.movie = movies.get(position);
-        holder.name.setText(movies.get(position).getOriginalTitle());
+        holder.name.setText(movies.get(position).getTitle());
     }
 
     @Override

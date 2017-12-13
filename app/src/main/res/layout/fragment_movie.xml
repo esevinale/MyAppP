@@ -1,19 +1,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/movie_container_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorDefaultWhite"
-    android:id="@+id/movie_container_view"
     tools:context="com.esevinale.myappportfolio.ui.MovieScreen.MovieListFragment">
 
 
-    <android.support.v7.widget.RecyclerView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/movie_swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:id="@+id/rv_movie">
+        android:layout_height="match_parent">
 
-    </android.support.v7.widget.RecyclerView>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_movie"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical">
+
+        </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 
 </LinearLayout>

@@ -6,6 +6,9 @@ import com.esevinale.myappportfolio.application.builder.AppComponent;
 import com.esevinale.myappportfolio.application.builder.AppModule;
 import com.esevinale.myappportfolio.application.builder.DaggerAppComponent;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 
 public class AppController extends Application{
 
@@ -16,6 +19,13 @@ public class AppController extends Application{
         super.onCreate();
 
         initComponent();
+
+        Realm.init(this);
+        RealmConfiguration realmConfiguration = new RealmConfiguration
+                .Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(realmConfiguration);
     }
 
     private void initComponent() {

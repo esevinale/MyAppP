@@ -5,11 +5,17 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class MovieItem {
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
+
+public class MovieItem extends RealmObject {
 
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private Integer id;
@@ -34,9 +40,11 @@ public class MovieItem {
     @SerializedName("original_title")
     @Expose
     private String originalTitle;
+    @Ignore
     @SerializedName("genre_ids")
     @Expose
     private List<Integer> genreIds = null;
+    private RealmList<RealmInteger> genreIdsRealm = new RealmList<>();
     @SerializedName("backdrop_path")
     @Expose
     private String backdropPath;
@@ -128,6 +136,11 @@ public class MovieItem {
 
     public void setGenreIds(List<Integer> genreIds) {
         this.genreIds = genreIds;
+        for (Integer i : genreIds) {
+            RealmInteger ri = new RealmInteger();
+            ri.setInteger(i);
+            genreIdsRealm.add(ri);
+        }
     }
 
     public String getBackdropPath() {
@@ -162,4 +175,11 @@ public class MovieItem {
         this.releaseDate = releaseDate;
     }
 
+    public RealmList<RealmInteger> getGenreIdsRealm() {
+        return genreIdsRealm;
+    }
+
+    public void setGenreIdsRealm(RealmList<RealmInteger> genreIdsRealm) {
+        this.genreIdsRealm = genreIdsRealm;
+    }
 }

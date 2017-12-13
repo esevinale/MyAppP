@@ -1,4 +1,4 @@
-package com.esevinale.myappportfolio.utils;
+package com.esevinale.myappportfolio.utils.manager;
 
 import android.support.annotation.IdRes;
 import android.support.v4.app.FragmentTransaction;
