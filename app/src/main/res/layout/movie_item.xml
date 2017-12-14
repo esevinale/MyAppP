@@ -1,7 +1,7 @@
 <FrameLayout android:id="@+id/movie_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="320dp"
+    android:layout_height="300dp"
     android:layout_gravity="center"
     android:clickable="true"
     android:focusable="true"

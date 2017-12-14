@@ -3,6 +3,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    
+
     <string name="movie_screen_name">Movies</string>
+    <string name="movie_details_name">Movie Details</string>
 </resources>

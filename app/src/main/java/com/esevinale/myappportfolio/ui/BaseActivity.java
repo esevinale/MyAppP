@@ -25,6 +25,8 @@ public abstract class BaseActivity extends MvpAppCompatActivity{
     Toolbar toolbar;
     @BindView(R.id.progress_bar)
     protected ProgressBar mProgressBar;
+    @BindView(R.id.main_wrapper)
+    FrameLayout parent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,6 @@ public abstract class BaseActivity extends MvpAppCompatActivity{
 
         setSupportActionBar(toolbar);
 
-        FrameLayout parent = findViewById(R.id.main_wrapper);
         getLayoutInflater().inflate(getMainContentLayout(), parent);
     }
 

@@ -1,16 +1,19 @@
 
 package com.esevinale.myappportfolio.models;
 
-import java.util.List;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import io.realm.RealmList;
+import java.util.List;
+
 import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
-public class MovieItem extends RealmObject {
+public class MovieItem extends RealmObject implements Parcelable {
 
     @SerializedName("vote_count")
     @Expose
@@ -44,7 +47,6 @@ public class MovieItem extends RealmObject {
     @SerializedName("genre_ids")
     @Expose
     private List<Integer> genreIds = null;
-    private RealmList<RealmInteger> genreIdsRealm = new RealmList<>();
     @SerializedName("backdrop_path")
     @Expose
     private String backdropPath;
@@ -57,6 +59,36 @@ public class MovieItem extends RealmObject {
     @SerializedName("release_date")
     @Expose
     private String releaseDate;
+
+    public MovieItem(){}
+
+    protected MovieItem(Parcel in) {
+        voteCount = in.readInt();
+        id = in.readInt();
+        video = in.readByte() != 0;
+        voteAverage = in.readDouble();
+        title = in.readString();
+        popularity = in.readDouble();
+        posterPath = in.readString();
+        originalLanguage = in.readString();
+        originalTitle = in.readString();
+        backdropPath = in.readString();
+        adult = in.readByte() != 0;
+        overview = in.readString();
+        releaseDate = in.readString();
+    }
+
+    public static final Creator<MovieItem> CREATOR = new Creator<MovieItem>() {
+        @Override
+        public MovieItem createFromParcel(Parcel in) {
+            return new MovieItem(in);
+        }
+
+        @Override
+        public MovieItem[] newArray(int size) {
+            return new MovieItem[size];
+        }
+    };
 
     public Integer getVoteCount() {
         return voteCount;
@@ -136,11 +168,6 @@ public class MovieItem extends RealmObject {
 
     public void setGenreIds(List<Integer> genreIds) {
         this.genreIds = genreIds;
-        for (Integer i : genreIds) {
-            RealmInteger ri = new RealmInteger();
-            ri.setInteger(i);
-            genreIdsRealm.add(ri);
-        }
     }
 
     public String getBackdropPath() {
@@ -175,11 +202,25 @@ public class MovieItem extends RealmObject {
         this.releaseDate = releaseDate;
     }
 
-    public RealmList<RealmInteger> getGenreIdsRealm() {
-        return genreIdsRealm;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setGenreIdsRealm(RealmList<RealmInteger> genreIdsRealm) {
-        this.genreIdsRealm = genreIdsRealm;
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(voteCount);
+        parcel.writeInt(id);
+        parcel.writeByte((byte) (video ? 1 : 0));
+        parcel.writeDouble(voteAverage);
+        parcel.writeString(title);
+        parcel.writeDouble(popularity);
+        parcel.writeString(posterPath);
+        parcel.writeString(originalLanguage);
+        parcel.writeString(originalTitle);
+        parcel.writeString(backdropPath);
+        parcel.writeByte((byte) (adult ? 1 : 0));
+        parcel.writeString(overview);
+        parcel.writeString(releaseDate);
     }
 }

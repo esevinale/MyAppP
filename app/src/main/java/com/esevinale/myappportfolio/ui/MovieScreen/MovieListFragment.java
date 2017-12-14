@@ -1,6 +1,7 @@
 package com.esevinale.myappportfolio.ui.MovieScreen;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +18,8 @@ import com.esevinale.myappportfolio.api.TmdbService;
 import com.esevinale.myappportfolio.application.AppController;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.ui.BaseFragment;
+import com.esevinale.myappportfolio.ui.MovieDetailsScreen.MovieDetailsActivity;
+import com.esevinale.myappportfolio.utils.Constants;
 import com.esevinale.myappportfolio.utils.manager.MyGridLayoutManager;
 
 import java.util.List;
@@ -73,7 +76,7 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
 
     @Override
     protected int getMainContentLayout() {
-        return R.layout.fragment_movie;
+        return R.layout.fragment_movie_list;
     }
 
     @Override
@@ -149,6 +152,10 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
 
     @Override
     public void onMovieClicked(MovieItem movie) {
-
+        Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
+        Bundle extras = new Bundle();
+        extras.putParcelable(Constants.MOVIE_ITEM, movie);
+        intent.putExtras(extras);
+        startActivity(intent);
     }
 }
