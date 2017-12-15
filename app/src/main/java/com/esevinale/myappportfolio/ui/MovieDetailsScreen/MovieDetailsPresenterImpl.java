@@ -39,7 +39,7 @@ public class MovieDetailsPresenterImpl extends MvpPresenter<MovieDetailsView> im
     @Override
     public void movieItemReady(MovieItem movieItem) {
         getViewState().showMovieDetails(movieItem);
-        getViewState().showMoviePoster(ApiConstants.POSTER_TMDB_URL + movieItem.getPosterPath());
+        getViewState().showMoviePoster(ApiConstants.BACK_TMDB_URL + movieItem.getBackdropPath());
 
         loadTrailers(movieItem.getId());
     }

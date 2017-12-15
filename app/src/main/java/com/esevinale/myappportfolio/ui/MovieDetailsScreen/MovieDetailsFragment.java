@@ -22,6 +22,8 @@ import android.widget.TextView;
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.esevinale.myappportfolio.R;
 import com.esevinale.myappportfolio.api.ApiConstants;
@@ -127,7 +129,10 @@ public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieD
 
     @Override
     public void showMoviePoster(String path) {
-        Glide.with(getContext()).load(path).into(moviePoster);
+        Glide
+                .with(getContext())
+                .load(path)
+                .into(moviePoster);
     }
 
     @Override
