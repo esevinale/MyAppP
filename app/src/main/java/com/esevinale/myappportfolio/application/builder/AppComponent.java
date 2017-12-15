@@ -3,6 +3,8 @@ package com.esevinale.myappportfolio.application.builder;
 import com.esevinale.myappportfolio.ui.BaseActivity;
 import com.esevinale.myappportfolio.ui.MainActivity;
 import com.esevinale.myappportfolio.ui.MovieDetailsScreen.MovieDetailsActivity;
+import com.esevinale.myappportfolio.ui.MovieDetailsScreen.MovieDetailsFragment;
+import com.esevinale.myappportfolio.ui.MovieDetailsScreen.MovieDetailsPresenterImpl;
 import com.esevinale.myappportfolio.ui.MovieScreen.MovieListFragment;
 import com.esevinale.myappportfolio.ui.MovieScreen.MovieListPresenter;
 import com.esevinale.myappportfolio.utils.manager.NetworkManager;
@@ -23,6 +25,7 @@ public interface AppComponent {
     void inject(MovieListFragment fragment);
 
     void inject(MovieListPresenter presenter);
+    void inject(MovieDetailsPresenterImpl presenter);
 
     void inject(NetworkManager manager);
 }

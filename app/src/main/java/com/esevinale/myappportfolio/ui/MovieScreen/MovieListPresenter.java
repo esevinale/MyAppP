@@ -5,8 +5,9 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.esevinale.myappportfolio.api.TmdbService;
 import com.esevinale.myappportfolio.application.AppController;
-import com.esevinale.myappportfolio.models.Full;
+import com.esevinale.myappportfolio.models.FullMovie;
 import com.esevinale.myappportfolio.models.MovieItem;
+import com.esevinale.myappportfolio.utils.Constants;
 import com.esevinale.myappportfolio.utils.manager.NetworkManager;
 
 import java.util.List;
@@ -19,7 +20,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -35,17 +35,17 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
 
     private boolean mIsInLoading;
 
-    public MovieListPresenter() {
+    MovieListPresenter() {
         AppController.getAppComponent().inject(this);
     }
 
-    public void loadData(ProgressType progressType, int page) {
+    private void loadData(ProgressType progressType, int page) {
         if (mIsInLoading) {
             return;
         }
         mIsInLoading = true;
 
-        networkManager.getNetworkObservable()
+        networkManager.getNetworkObservable(Constants.TMDB)
                 .flatMap(aBoolean -> {
                     if (!aBoolean && page > 1) {
                         return Observable.empty();
@@ -66,44 +66,44 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
                 });
     }
 
-    public Observable<List<MovieItem>> onCreateLoadDataObservable(int page) {
-        return tmdbService.getLatestMovie(page).map(Full::getResults)
+    private Observable<List<MovieItem>> onCreateLoadDataObservable(int page) {
+        return tmdbService.getLatestMovie(page).map(FullMovie::getResults)
                 .doOnNext(this::saveToDb);
     }
 
-    public Observable<List<MovieItem>> onCreateRestoreDataObservable() {
+    private Observable<List<MovieItem>> onCreateRestoreDataObservable() {
         return Observable.fromCallable(getListFromRealmCallable());
     }
 
 
-    public void loadStart() {
+    void loadStart() {
         loadData(ProgressType.ListProgress, 1);
     }
 
-    public void loadNext(int page) {
+    void loadNext(int page) {
         loadData(ProgressType.Paging, page);
     }
 
-    public void loadRefresh() {
+    void loadRefresh() {
         loadData(ProgressType.Refreshing, 1);
     }
 
 
-    public void onLoadingStart(ProgressType progressType) {
+    private void onLoadingStart(ProgressType progressType) {
         showProgress(progressType);
     }
 
-    public void onLoadingFinish(ProgressType progressType) {
+    private void onLoadingFinish(ProgressType progressType) {
         mIsInLoading = false;
         hideProgress(progressType);
     }
 
-    public void onLoadingFailed(Throwable throwable) {
+    private void onLoadingFailed(Throwable throwable) {
         getViewState().showError(throwable.getMessage());
     }
 
 
-    public void onLoadingSuccess(ProgressType progressType, List<MovieItem> items) {
+    private void onLoadingSuccess(ProgressType progressType, List<MovieItem> items) {
         if (progressType == ProgressType.Paging) {
             getViewState().addMovies(items);
         } else {
@@ -117,7 +117,7 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
     }
 
 
-    public void showProgress(ProgressType progressType) {
+    private void showProgress(ProgressType progressType) {
         switch (progressType) {
             case Refreshing:
                 getViewState().showRefreshing();
@@ -128,7 +128,7 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
         }
     }
 
-    public void hideProgress(ProgressType progressType) {
+    private void hideProgress(ProgressType progressType) {
         switch (progressType) {
             case Refreshing:
                 getViewState().hideRefreshing();
@@ -139,14 +139,14 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
         }
     }
 
-    public void saveToDb(List<MovieItem> item) {
+    private void saveToDb(List<MovieItem> item) {
         Realm realm = Realm.getDefaultInstance();
         RealmList<MovieItem> insert = new RealmList<>();
         insert.addAll(item);
         realm.executeTransaction(realm1 -> realm1.copyToRealmOrUpdate(insert));
     }
 
-    public Callable<List<MovieItem>> getListFromRealmCallable() {
+    private Callable<List<MovieItem>> getListFromRealmCallable() {
         return () -> {
             String[] sorftFields = {"popularity"};
             Sort[] sortOrder = {Sort.DESCENDING};

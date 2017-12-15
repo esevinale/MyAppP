@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 
 import com.esevinale.myappportfolio.api.ApiConstants;
 import com.esevinale.myappportfolio.application.AppController;
+import com.esevinale.myappportfolio.utils.Constants;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -26,13 +27,13 @@ public class NetworkManager {
         AppController.getAppComponent().inject(this);
     }
 
-    public boolean isOnline() {
+    private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return ((networkInfo != null && networkInfo.isConnected()) || Util.isEmulator());
     }
 
-    public Callable<Boolean> isTmdbReachableCallable() {
+    private Callable<Boolean> isTmdbReachableCallable(String site) {
         return () -> {
             try {
                 if (!isOnline()) {
@@ -40,6 +41,8 @@ public class NetworkManager {
                 }
 
                 URL url = new URL(ApiConstants.BASE_TMDB_URL);
+                if (site.equals(Constants.YOUTUBE))
+                    url = new URL(ApiConstants.BASE_YOUTUBE_URL);
                 HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
                 urlc.setConnectTimeout(2000);
                 urlc.connect();
@@ -53,7 +56,7 @@ public class NetworkManager {
     }
 
 
-    public Observable<Boolean> getNetworkObservable() {
-        return Observable.fromCallable(isTmdbReachableCallable());
+    public Observable<Boolean> getNetworkObservable(String site) {
+        return Observable.fromCallable(isTmdbReachableCallable(site));
     }
 }

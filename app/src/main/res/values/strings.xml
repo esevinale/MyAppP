@@ -6,4 +6,10 @@
 
     <string name="movie_screen_name">Movies</string>
     <string name="movie_details_name">Movie Details</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="movie_rating">Rating: %s</string>
+    <string name="movie_details_toolbar">Movie \'%s\' details</string>
+    <string name="movie">%s (%s)</string>
+    <string name="overview">Overview</string>
+    <string name="Trailer">Trailer</string>
 </resources>

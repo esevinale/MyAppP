@@ -2,6 +2,7 @@ package com.esevinale.myappportfolio.ui.MovieDetailsScreen;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.esevinale.myappportfolio.R;
@@ -22,9 +23,16 @@ public class MovieDetailsActivity extends MvpAppCompatActivity {
                 if (movie != null) {
                     MovieDetailsFragment movieDetailsFragment = MovieDetailsFragment.getInstance(movie);
                     getSupportFragmentManager().beginTransaction().add(R.id.details_wrapper, movieDetailsFragment).commit();
-                    Log.d("myLogs", "onCreate: 123");
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 }
