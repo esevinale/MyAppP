@@ -53,7 +53,8 @@ public class MovieDetailsPresenterImpl extends MvpPresenter<MovieDetailsView> im
         tmdbService.getYoutubeFrailers(key)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::trailersLoaded);
+                .subscribe(this::trailersLoaded,
+                error -> {});
     }
 
     private void trailersLoaded(FullVideo video) {
