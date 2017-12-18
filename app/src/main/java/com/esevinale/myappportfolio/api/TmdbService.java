@@ -11,8 +11,11 @@ import retrofit2.http.Query;
 
 public interface TmdbService {
 
-    @GET("3/discover/movie?&sort_by=popularity.desc&language=en-US")
-    Observable<FullMovie> getLatestMovie(@Query("page") int page);
+    @GET("3/discover/movie?&language=en-US&sort_by=popularity.desc")
+    Observable<FullMovie> getPopularMovies(@Query("page") int page);
+
+    @GET("3/discover/movie?&language=en-US&sort_by=popularity.desc")
+    Observable<FullMovie> getLatestMovies(@Query("primary_release_date.gte")String gte, @Query("primary_release_date.lte") String lte, @Query("page") int page);
 
     @GET("3/movie/{movie_id}/videos")
     Observable<FullVideo> getYoutubeFrailers(@Path("movie_id") int movie_id);

@@ -7,6 +7,7 @@ import com.esevinale.myappportfolio.ui.MovieDetailsScreen.MovieDetailsFragment;
 import com.esevinale.myappportfolio.ui.MovieDetailsScreen.MovieDetailsPresenterImpl;
 import com.esevinale.myappportfolio.ui.MovieScreen.MovieListFragment;
 import com.esevinale.myappportfolio.ui.MovieScreen.MovieListPresenter;
+import com.esevinale.myappportfolio.utils.manager.MyPreferencesManager;
 import com.esevinale.myappportfolio.utils.manager.NetworkManager;
 
 import javax.inject.Singleton;
@@ -28,4 +29,5 @@ public interface AppComponent {
     void inject(MovieDetailsPresenterImpl presenter);
 
     void inject(NetworkManager manager);
+    void inject(MyPreferencesManager manager);
 }

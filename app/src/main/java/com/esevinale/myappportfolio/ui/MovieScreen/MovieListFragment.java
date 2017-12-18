@@ -5,9 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -57,6 +61,7 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppController.getAppComponent().inject(this);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -70,8 +75,22 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.movie_list_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sort_popularity:
+                movieListPresenter.onOptionItemSelected(Constants.POPULAR);
+                break;
+            case R.id.action_sort_latest:
+                movieListPresenter.onOptionItemSelected(Constants.LATEST);
+                break;
+        };
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -91,7 +110,7 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (myGridLayoutManager.isOnNextPagePosition())
-                    movieListPresenter.loadNext((movieListAdapter.getItemCount()/20) + 1);
+                    movieListPresenter.loadNext((movieListAdapter.getItemCount() / 20) + 1);
             }
         });
 

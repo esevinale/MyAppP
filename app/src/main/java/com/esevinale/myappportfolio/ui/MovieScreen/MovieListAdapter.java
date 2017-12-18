@@ -51,12 +51,16 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .priority(Priority.HIGH);
 
-        Glide
-                .with(context)
-                .asBitmap()
-                .apply(options)
-                .load(ApiConstants.POSTER_TMDB_URL + holder.movie.getPosterPath())
-                .into(holder.poster);
+        if (holder.movie.getPosterPath() == null) {
+            holder.poster.setImageResource(R.drawable.noimagefound);
+        } else {
+            Glide
+                    .with(context)
+                    .asBitmap()
+                    .apply(options)
+                    .load(ApiConstants.POSTER_TMDB_URL + holder.movie.getPosterPath())
+                    .into(holder.poster);
+        }
     }
 
     @Override

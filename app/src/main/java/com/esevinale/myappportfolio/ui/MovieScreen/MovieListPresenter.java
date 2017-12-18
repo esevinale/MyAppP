@@ -3,13 +3,17 @@ package com.esevinale.myappportfolio.ui.MovieScreen;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
+import com.esevinale.myappportfolio.api.ApiConstants;
 import com.esevinale.myappportfolio.api.TmdbService;
 import com.esevinale.myappportfolio.application.AppController;
 import com.esevinale.myappportfolio.models.FullMovie;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.utils.Constants;
+import com.esevinale.myappportfolio.utils.manager.MyPreferencesManager;
 import com.esevinale.myappportfolio.utils.manager.NetworkManager;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -33,10 +37,16 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
     @Inject
     NetworkManager networkManager;
 
+    @Inject
+    MyPreferencesManager preferencesManager;
+
     private boolean mIsInLoading;
+
+    private static byte loadType;
 
     MovieListPresenter() {
         AppController.getAppComponent().inject(this);
+        loadType = (byte) preferencesManager.getSelectedOption();
     }
 
     private void loadData(ProgressType progressType, int page) {
@@ -67,8 +77,37 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
     }
 
     private Observable<List<MovieItem>> onCreateLoadDataObservable(int page) {
-        return tmdbService.getLatestMovie(page).map(FullMovie::getResults)
-                .doOnNext(this::saveToDb);
+        switch (loadType) {
+            case Constants.POPULAR:
+                return tmdbService.getPopularMovies(page).map(FullMovie::getResults)
+                        .doOnNext(this::saveToDb);
+            case Constants.LATEST:
+                return tmdbService.getLatestMovies(createGteDate(), createLteDate(), page).map(FullMovie::getResults)
+                        .doOnNext(this::saveToDb);
+            default:
+                return tmdbService.getPopularMovies(1).map(FullMovie::getResults)
+                        .doOnNext(this::saveToDb);
+        }
+    }
+
+    private String createGteDate() {
+        int monthGte = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        return primaryReleaseDateToString(monthGte, Calendar.getInstance().get(Calendar.YEAR));
+    }
+    private String createLteDate() {
+        int monthLte = Calendar.getInstance().get(Calendar.MONTH) + 2;
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        if (monthLte > 12)
+            return primaryReleaseDateToString(1, year + 1);
+        else
+            return primaryReleaseDateToString(monthLte, year);
+    }
+
+    private String primaryReleaseDateToString(int monthInt, int year) {
+        String month = Integer.toString(monthInt);
+        if (month.length() == 1)
+            month = "0".concat(month);
+        return Integer.toString(year) + "-" + month + "-01";
     }
 
     private Observable<List<MovieItem>> onCreateRestoreDataObservable() {
@@ -148,12 +187,20 @@ public class MovieListPresenter extends MvpPresenter<MovieListView> {
 
     private Callable<List<MovieItem>> getListFromRealmCallable() {
         return () -> {
-            String[] sorftFields = {"popularity"};
+            String[] sortFields = {"popularity"};
             Sort[] sortOrder = {Sort.DESCENDING};
+            if (loadType == Constants.LATEST)
+                sortFields = new String[]{"releaseDate"};
             Realm realm = Realm.getDefaultInstance();
             RealmResults<MovieItem> realmResults = realm.where(MovieItem.class)
-                    .findAllSorted(sorftFields, sortOrder);
+                    .findAllSorted(sortFields, sortOrder);
             return realm.copyFromRealm(realmResults);
         };
+    }
+
+    void onOptionItemSelected(byte loadType) {
+        this.loadType = loadType;
+        preferencesManager.setSelectedOption(loadType);
+        loadStart();
     }
 }
