@@ -28,7 +28,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     private MovieListView view;
     private Context context;
 
-    public MovieListAdapter(MovieListView moviesView) {
+    MovieListAdapter(MovieListView moviesView) {
         view = moviesView;
     }
 
@@ -72,17 +72,17 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         return movies.get(position);
     }
 
-    public void addMovies(List<MovieItem> movieItemList) {
+    void addMovies(List<MovieItem> movieItemList) {
         movies.addAll(movieItemList);
         notifyDataSetChanged();
     }
 
-    public void setMovies(List<MovieItem> movieItemList) {
+    void setMovies(List<MovieItem> movieItemList) {
         clearList();
         addMovies(movieItemList);
     }
 
-    public void clearList() {
+    private void clearList() {
         movies.clear();
     }
 
@@ -95,9 +95,9 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         @BindView(R.id.movie_name)
         TextView name;
 
-        public MovieItem movie;
+        MovieItem movie;
 
-        public ViewHolder(View root) {
+        ViewHolder(View root) {
             super(root);
             ButterKnife.bind(this, root);
         }

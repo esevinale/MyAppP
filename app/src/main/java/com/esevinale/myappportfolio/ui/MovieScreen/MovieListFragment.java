@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -47,7 +46,7 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
     protected ProgressBar mProgressBar;
 
     @InjectPresenter
-    MovieListPresenter movieListPresenter;
+    MovieListPresenterImpl movieListPresenter;
 
     MovieListAdapter movieListAdapter;
     private Unbinder unbinder;
@@ -89,7 +88,7 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
             case R.id.action_sort_latest:
                 movieListPresenter.onOptionItemSelected(Constants.LATEST);
                 break;
-        };
+        }
         return super.onOptionsItemSelected(item);
     }
 

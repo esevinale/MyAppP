@@ -1,6 +1,8 @@
 package com.esevinale.myappportfolio.api;
 
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -17,11 +19,11 @@ import static com.esevinale.myappportfolio.api.ApiConstants.TMDB_KEY;
 public class ApiKeyInterceptor implements Interceptor{
 
     @Inject
-    public ApiKeyInterceptor() {
+    ApiKeyInterceptor() {
     }
 
     @Override
-    public Response intercept(Chain chain) throws IOException {
+    public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
 
         HttpUrl suppUrl = chain.request().url().newBuilder()

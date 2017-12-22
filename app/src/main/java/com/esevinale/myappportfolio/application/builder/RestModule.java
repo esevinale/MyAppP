@@ -17,9 +17,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
-public class RestModule {
+class RestModule {
 
-    public static final int CONNECT_TIMEOUT = 15000;
+    private static final int CONNECT_TIMEOUT = 15000;
 
     @Provides
     @Singleton

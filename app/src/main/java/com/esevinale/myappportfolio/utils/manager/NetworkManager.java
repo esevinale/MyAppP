@@ -21,15 +21,13 @@ public class NetworkManager {
     @Inject
     Context mContext;
 
-    private static final String TAG = "NetworkManager";
-
     public NetworkManager() {
         AppController.getAppComponent().inject(this);
     }
 
     private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        NetworkInfo networkInfo = cm != null ? cm.getActiveNetworkInfo() : null;
         return ((networkInfo != null && networkInfo.isConnected()) || Util.isEmulator());
     }
 

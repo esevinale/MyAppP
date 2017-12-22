@@ -6,11 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +20,6 @@ import android.widget.TextView;
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.esevinale.myappportfolio.R;
 import com.esevinale.myappportfolio.api.ApiConstants;
@@ -37,9 +33,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieDetailsView {
 
     private Unbinder unbinder;
@@ -90,8 +83,9 @@ public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieD
 
     private void setUpToolBar() {
         if (toolbar != null) {
-            assert getActivity() != null;
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            if (getActivity() != null) {
+                ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            }
 
             ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             if (actionBar != null) {

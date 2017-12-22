@@ -2,9 +2,6 @@ package com.esevinale.myappportfolio.utils.manager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
-import javax.inject.Inject;
 
 public class MyPreferencesManager {
 
