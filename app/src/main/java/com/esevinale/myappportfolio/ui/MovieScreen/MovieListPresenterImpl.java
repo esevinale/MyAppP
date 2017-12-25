@@ -53,7 +53,7 @@ public class MovieListPresenterImpl extends MvpPresenter<MovieListView> implemen
                     }
                     return aBoolean
                             ? movieContentInteractor.loadData(page)
-                            : movieContentInteractor.restoreData();
+                            : movieContentInteractor.restoreData(loadType);
 
                 })
 

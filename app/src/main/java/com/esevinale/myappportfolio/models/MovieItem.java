@@ -1,101 +1,39 @@
-
 package com.esevinale.myappportfolio.models;
+
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-
 import io.realm.RealmObject;
-import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
 public class MovieItem extends RealmObject implements Parcelable {
 
-    @SerializedName("vote_count")
-    @Expose
-    private Integer voteCount;
     @PrimaryKey
-    @SerializedName("id")
-    @Expose
     private Integer id;
-    @SerializedName("video")
-    @Expose
     private Boolean video;
-    @SerializedName("vote_average")
-    @Expose
     private Double voteAverage;
-    @SerializedName("title")
-    @Expose
     private String title;
-    @SerializedName("popularity")
-    @Expose
     private Double popularity;
-    @SerializedName("poster_path")
-    @Expose
     private String posterPath;
-    @SerializedName("original_language")
-    @Expose
-    private String originalLanguage;
-    @SerializedName("original_title")
-    @Expose
-    private String originalTitle;
-    @Ignore
-    @SerializedName("genre_ids")
-    @Expose
-    private List<Integer> genreIds = null;
-    @SerializedName("backdrop_path")
-    @Expose
     private String backdropPath;
-    @SerializedName("adult")
-    @Expose
-    private Boolean adult;
-    @SerializedName("overview")
-    @Expose
     private String overview;
-    @SerializedName("release_date")
-    @Expose
     private String releaseDate;
+    private byte filter_type;
 
     public MovieItem(){}
 
-    protected MovieItem(Parcel in) {
-        voteCount = in.readInt();
-        id = in.readInt();
-        video = in.readByte() != 0;
-        voteAverage = in.readDouble();
-        title = in.readString();
-        popularity = in.readDouble();
-        posterPath = in.readString();
-        originalLanguage = in.readString();
-        originalTitle = in.readString();
-        backdropPath = in.readString();
-        adult = in.readByte() != 0;
-        overview = in.readString();
-        releaseDate = in.readString();
-    }
-
-    public static final Creator<MovieItem> CREATOR = new Creator<MovieItem>() {
-        @Override
-        public MovieItem createFromParcel(Parcel in) {
-            return new MovieItem(in);
-        }
-
-        @Override
-        public MovieItem[] newArray(int size) {
-            return new MovieItem[size];
-        }
-    };
-
-    public Integer getVoteCount() {
-        return voteCount;
-    }
-
-    public void setVoteCount(Integer voteCount) {
-        this.voteCount = voteCount;
+    public MovieItem(Integer id, Boolean video, Double voteAverage, String title, Double popularity, String posterPath, String backdropPath, String overview, String releaseDate, byte filter_type) {
+        this.id = id;
+        this.video = video;
+        this.voteAverage = voteAverage;
+        this.title = title;
+        this.popularity = popularity;
+        this.posterPath = posterPath;
+        this.backdropPath = backdropPath;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.filter_type = filter_type;
     }
 
     public Integer getId() {
@@ -146,44 +84,12 @@ public class MovieItem extends RealmObject implements Parcelable {
         this.posterPath = posterPath;
     }
 
-    public String getOriginalLanguage() {
-        return originalLanguage;
-    }
-
-    public void setOriginalLanguage(String originalLanguage) {
-        this.originalLanguage = originalLanguage;
-    }
-
-    public String getOriginalTitle() {
-        return originalTitle;
-    }
-
-    public void setOriginalTitle(String originalTitle) {
-        this.originalTitle = originalTitle;
-    }
-
-    public List<Integer> getGenreIds() {
-        return genreIds;
-    }
-
-    public void setGenreIds(List<Integer> genreIds) {
-        this.genreIds = genreIds;
-    }
-
     public String getBackdropPath() {
         return backdropPath;
     }
 
     public void setBackdropPath(String backdropPath) {
         this.backdropPath = backdropPath;
-    }
-
-    public Boolean getAdult() {
-        return adult;
-    }
-
-    public void setAdult(Boolean adult) {
-        this.adult = adult;
     }
 
     public String getOverview() {
@@ -202,6 +108,39 @@ public class MovieItem extends RealmObject implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
+    public byte getFilter_type() {
+        return filter_type;
+    }
+
+    public void setFilter_type(byte filter_type) {
+        this.filter_type = filter_type;
+    }
+
+    protected MovieItem(Parcel in) {
+        id = in.readInt();
+        video = in.readByte() != 0;
+        voteAverage = in.readDouble();
+        title = in.readString();
+        popularity = in.readDouble();
+        posterPath = in.readString();
+        backdropPath = in.readString();
+        overview = in.readString();
+        releaseDate = in.readString();
+        filter_type = in.readByte();
+    }
+
+    public static final Creator<MovieItem> CREATOR = new Creator<MovieItem>() {
+        @Override
+        public MovieItem createFromParcel(Parcel in) {
+            return new MovieItem(in);
+        }
+
+        @Override
+        public MovieItem[] newArray(int size) {
+            return new MovieItem[size];
+        }
+    };
+
     @Override
     public int describeContents() {
         return 0;
@@ -209,18 +148,15 @@ public class MovieItem extends RealmObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(voteCount);
         parcel.writeInt(id);
         parcel.writeByte((byte) (video ? 1 : 0));
         parcel.writeDouble(voteAverage);
         parcel.writeString(title);
         parcel.writeDouble(popularity);
         parcel.writeString(posterPath);
-        parcel.writeString(originalLanguage);
-        parcel.writeString(originalTitle);
         parcel.writeString(backdropPath);
-        parcel.writeByte((byte) (adult ? 1 : 0));
         parcel.writeString(overview);
         parcel.writeString(releaseDate);
+        parcel.writeByte(filter_type);
     }
 }

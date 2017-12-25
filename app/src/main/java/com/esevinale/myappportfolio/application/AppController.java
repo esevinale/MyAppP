@@ -5,7 +5,6 @@ import android.app.Application;
 import com.esevinale.myappportfolio.application.builder.AppComponent;
 import com.esevinale.myappportfolio.application.builder.AppModule;
 import com.esevinale.myappportfolio.application.builder.DaggerAppComponent;
-
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -19,7 +18,10 @@ public class AppController extends Application{
         super.onCreate();
 
         initComponent();
+        initRealm();
+    }
 
+    private void initRealm() {
         Realm.init(this);
         RealmConfiguration realmConfiguration = new RealmConfiguration
                 .Builder()

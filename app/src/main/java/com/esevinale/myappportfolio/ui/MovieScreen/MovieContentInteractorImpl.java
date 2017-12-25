@@ -2,9 +2,11 @@ package com.esevinale.myappportfolio.ui.MovieScreen;
 
 import com.esevinale.myappportfolio.api.TmdbService;
 import com.esevinale.myappportfolio.models.FullMovie;
+import com.esevinale.myappportfolio.models.MovieDTO;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -29,20 +31,33 @@ public class MovieContentInteractorImpl implements MovieContentInteractor {
     public Observable<List<MovieItem>> loadData(int page) {
         switch (loadType) {
             case Constants.POPULAR:
-                return tmdbService.getPopularMovies(page).map(FullMovie::getResults)
+                return tmdbService.getPopularMovies(page)
+                        .map(FullMovie::getResults)
+                        .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.POPULAR))
                         .doOnNext(this::saveToDb);
             case Constants.LATEST:
-                return tmdbService.getLatestMovies(createGteDate(), createLteDate(), page).map(FullMovie::getResults)
+                return tmdbService.getLatestMovies(createGteDate(), createLteDate(), page)
+                        .map(FullMovie::getResults)
+                        .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.LATEST))
                         .doOnNext(this::saveToDb);
             default:
-                return tmdbService.getPopularMovies(1).map(FullMovie::getResults)
+                return tmdbService.getPopularMovies(1)
+                        .map(FullMovie::getResults)
+                        .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.POPULAR))
                         .doOnNext(this::saveToDb);
         }
     }
 
     @Override
-    public Observable<List<MovieItem>> restoreData() {
-        return Observable.fromCallable(getListFromRealmCallable());
+    public Observable<List<MovieItem>> restoreData(byte filter) {
+        return Observable.fromCallable(getListFromRealmCallable(filter));
+    }
+
+    private List<MovieItem> movieMapper(List<MovieDTO> movieDTOS, byte filter) {
+        List<MovieItem> movies = new ArrayList<>();
+        for (MovieDTO movieDTO : movieDTOS)
+            movies.add(new MovieItem(movieDTO.getId(), movieDTO.getVideo(), movieDTO.getVoteAverage(), movieDTO.getTitle(), movieDTO.getPopularity(), movieDTO.getPosterPath(), movieDTO.getBackdropPath(), movieDTO.getOverview(), movieDTO.getReleaseDate(), filter));
+        return movies;
     }
 
     private String createGteDate() {
@@ -73,15 +88,20 @@ public class MovieContentInteractorImpl implements MovieContentInteractor {
         realm.executeTransaction(realm1 -> realm1.copyToRealmOrUpdate(insert));
     }
 
-    private Callable<List<MovieItem>> getListFromRealmCallable() {
+    private Callable<List<MovieItem>> getListFromRealmCallable(byte filter) {
         return () -> {
             String[] sortFields = {"popularity"};
             Sort[] sortOrder = {Sort.DESCENDING};
-            if (loadType == Constants.LATEST)
-                sortFields = new String[]{"releaseDate"};
             Realm realm = Realm.getDefaultInstance();
-            RealmResults<MovieItem> realmResults = realm.where(MovieItem.class)
-                    .findAllSorted(sortFields, sortOrder);
+            RealmResults<MovieItem> realmResults;
+            if (filter == Constants.LATEST)
+                realmResults = realm.where(MovieItem.class)
+                        .equalTo("filter_type", Constants.LATEST)
+                        .findAllSorted(sortFields, sortOrder);
+            else
+                realmResults = realm.where(MovieItem.class)
+                        .equalTo("filter_type", Constants.POPULAR)
+                        .findAllSorted(sortFields, sortOrder);
             return realm.copyFromRealm(realmResults);
         };
     }

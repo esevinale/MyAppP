@@ -9,5 +9,5 @@ import io.reactivex.Observable;
 
 public interface MovieContentInteractor {
     Observable<List<MovieItem>> loadData(int page);
-    Observable<List<MovieItem>> restoreData();
+    Observable<List<MovieItem>> restoreData(byte filter);
 }
