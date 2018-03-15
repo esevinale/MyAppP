@@ -1,13 +1,13 @@
-package com.esevinale.myappportfolio.ui.MovieScreen;
+package com.esevinale.myappportfolio.repository;
 
 import com.esevinale.myappportfolio.api.TmdbService;
 import com.esevinale.myappportfolio.models.FullMovie;
 import com.esevinale.myappportfolio.models.MovieDTO;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.utils.Constants;
+import com.esevinale.myappportfolio.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -17,7 +17,6 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-import static com.esevinale.myappportfolio.ui.MovieScreen.MovieListPresenterImpl.loadType;
 
 public class MovieContentInteractorImpl implements MovieContentInteractor {
 
@@ -28,24 +27,18 @@ public class MovieContentInteractorImpl implements MovieContentInteractor {
     }
 
     @Override
-    public Observable<List<MovieItem>> loadData(int page) {
-        switch (loadType) {
-            case Constants.POPULAR:
-                return tmdbService.getPopularMovies(page)
-                        .map(FullMovie::getResults)
-                        .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.POPULAR))
-                        .doOnNext(this::saveToDb);
-            case Constants.LATEST:
-                return tmdbService.getLatestMovies(createGteDate(), createLteDate(), page)
-                        .map(FullMovie::getResults)
-                        .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.LATEST))
-                        .doOnNext(this::saveToDb);
-            default:
-                return tmdbService.getPopularMovies(1)
-                        .map(FullMovie::getResults)
-                        .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.POPULAR))
-                        .doOnNext(this::saveToDb);
-        }
+    public Observable<List<MovieItem>> loadData(int page, int loadType) {
+        if (loadType == Constants.LATEST)
+            return tmdbService.getLatestMovies(Utils.createGteDate(), Utils.createLteDate(), page)
+                    .map(FullMovie::getResults)
+                    .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.LATEST))
+                    .doOnNext(this::saveToDb);
+        else
+            return tmdbService.getPopularMovies(page)
+                    .map(FullMovie::getResults)
+                    .map(movieDTOS1 -> movieMapper(movieDTOS1, Constants.POPULAR))
+                    .doOnNext(this::saveToDb);
+
     }
 
     @Override
@@ -60,32 +53,15 @@ public class MovieContentInteractorImpl implements MovieContentInteractor {
         return movies;
     }
 
-    private String createGteDate() {
-        int monthGte = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        return primaryReleaseDateToString(monthGte, Calendar.getInstance().get(Calendar.YEAR));
-    }
-
-    private String createLteDate() {
-        int monthLte = Calendar.getInstance().get(Calendar.MONTH) + 2;
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        if (monthLte > 12)
-            return primaryReleaseDateToString(1, year + 1);
-        else
-            return primaryReleaseDateToString(monthLte, year);
-    }
-
-    private String primaryReleaseDateToString(int monthInt, int year) {
-        String month = Integer.toString(monthInt);
-        if (month.length() == 1)
-            month = "0".concat(month);
-        return Integer.toString(year) + "-" + month + "-01";
-    }
 
     private void saveToDb(List<MovieItem> item) {
         Realm realm = Realm.getDefaultInstance();
         RealmList<MovieItem> insert = new RealmList<>();
         insert.addAll(item);
-        realm.executeTransaction(realm1 -> realm1.copyToRealmOrUpdate(insert));
+        realm.executeTransaction(realm1 -> {
+            realm1.delete(MovieItem.class);
+            realm1.insertOrUpdate(insert);
+        });
     }
 
     private Callable<List<MovieItem>> getListFromRealmCallable(byte filter) {

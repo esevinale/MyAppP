@@ -1,6 +1,5 @@
 package com.esevinale.myappportfolio.api;
 
-
 import android.support.annotation.NonNull;
 
 import java.io.IOException;

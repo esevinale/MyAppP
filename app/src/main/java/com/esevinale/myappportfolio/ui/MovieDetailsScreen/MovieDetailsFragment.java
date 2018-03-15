@@ -19,23 +19,29 @@ import android.widget.TextView;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.esevinale.myappportfolio.R;
 import com.esevinale.myappportfolio.api.ApiConstants;
+import com.esevinale.myappportfolio.application.AppController;
+import com.esevinale.myappportfolio.application.builder.MovieDetailsComponent;
+import com.esevinale.myappportfolio.application.builder.MovieDetailsModule;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.models.Video;
 import com.esevinale.myappportfolio.utils.Constants;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
 
 public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieDetailsView {
 
-    private Unbinder unbinder;
     @BindView(R.id.movie_name)
     TextView movieName;
     @BindView(R.id.movie_rating)
@@ -55,14 +61,27 @@ public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieD
     @BindView(R.id.ll_trailers)
     LinearLayout trailersll;
 
+    @Inject
     @InjectPresenter
     MovieDetailsPresenterImpl mPresenter;
 
+    @ProvidePresenter
+    MovieDetailsPresenterImpl providePresenter() {
+        return movieDetailsComponent.providePresenter();
+    }
+
+    private Unbinder unbinder;
+    private MovieDetailsComponent movieDetailsComponent;
 
     public MovieDetailsFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        movieDetailsComponent = AppController.getAppComponent().createMovieDetailsComponent(new MovieDetailsModule());
+        super.onCreate(savedInstanceState);
+    }
 
     public static MovieDetailsFragment getInstance(@NonNull MovieItem movie) {
         Bundle args = new Bundle();
@@ -94,8 +113,6 @@ public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieD
         }
     }
 
-
-
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -121,6 +138,7 @@ public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieD
         movieOverview.setText(movieItem.getOverview());
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void showMoviePoster(String path) {
         Glide
@@ -129,6 +147,7 @@ public class MovieDetailsFragment extends MvpAppCompatFragment implements MovieD
                 .into(moviePoster);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void showTrailers(List<Video> video) {
         trailerSection.setVisibility(View.VISIBLE);

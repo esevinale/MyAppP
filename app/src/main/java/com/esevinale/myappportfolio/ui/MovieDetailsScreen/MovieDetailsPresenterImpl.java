@@ -4,17 +4,13 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.esevinale.myappportfolio.api.ApiConstants;
 import com.esevinale.myappportfolio.api.TmdbService;
-import com.esevinale.myappportfolio.application.AppController;
 import com.esevinale.myappportfolio.models.FullVideo;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.models.Video;
 import com.esevinale.myappportfolio.utils.Constants;
-import com.esevinale.myappportfolio.utils.manager.NetworkManager;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -23,16 +19,11 @@ import io.reactivex.schedulers.Schedulers;
 public class MovieDetailsPresenterImpl extends MvpPresenter<MovieDetailsView> implements MovieDetailsPresenter {
 
 
-    @Inject
-    TmdbService tmdbService;
+    private TmdbService tmdbService;
 
-    @Inject
-    NetworkManager networkManager;
-
-    MovieDetailsPresenterImpl() {
-        AppController.getAppComponent().inject(this);
+    public MovieDetailsPresenterImpl(TmdbService tmdbService) {
+        this.tmdbService = tmdbService;
     }
-
 
     @Override
     public void movieItemReady(MovieItem movieItem) {
@@ -48,7 +39,7 @@ public class MovieDetailsPresenterImpl extends MvpPresenter<MovieDetailsView> im
     }
 
     private void loadTrailers(int key) {
-        tmdbService.getYoutubeFrailers(key)
+        tmdbService.getYoutubeTrailers(key)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::trailersLoaded,

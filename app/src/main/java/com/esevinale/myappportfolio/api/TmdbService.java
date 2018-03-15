@@ -18,5 +18,5 @@ public interface TmdbService {
     Observable<FullMovie> getLatestMovies(@Query("primary_release_date.gte")String gte, @Query("primary_release_date.lte") String lte, @Query("page") int page);
 
     @GET("3/movie/{movie_id}/videos")
-    Observable<FullVideo> getYoutubeFrailers(@Path("movie_id") int movie_id);
+    Observable<FullVideo> getYoutubeTrailers(@Path("movie_id") int movie_id);
 }

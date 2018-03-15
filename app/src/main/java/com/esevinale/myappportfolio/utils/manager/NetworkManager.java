@@ -37,14 +37,12 @@ public class NetworkManager {
                 if (!isOnline()) {
                     return false;
                 }
-
                 URL url = new URL(ApiConstants.BASE_TMDB_URL);
                 if (site.equals(Constants.YOUTUBE))
                     url = new URL(ApiConstants.BASE_YOUTUBE_URL);
                 HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
                 urlc.setConnectTimeout(2000);
                 urlc.connect();
-
                 return true;
 
             } catch (Exception e) {

@@ -1,4 +1,4 @@
-package com.esevinale.myappportfolio.ui.MovieScreen;
+package com.esevinale.myappportfolio.ui.MovieListScreen;
 
 import com.arellomobile.mvp.MvpView;
 import com.esevinale.myappportfolio.models.MovieItem;
@@ -14,10 +14,11 @@ public interface MovieListView extends MvpView{
     void showListProgress();
     void hideListProgress();
 
-    void showError(String message);
+    void showError();
 
     void setMovies(List<MovieItem> movies);
     void addMovies(List<MovieItem> movies);
 
     void onMovieClicked(MovieItem movie);
+    void startMovieDetails(MovieItem movie);
 }

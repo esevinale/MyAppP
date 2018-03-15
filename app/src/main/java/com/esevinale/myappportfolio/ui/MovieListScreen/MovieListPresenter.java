@@ -1,5 +1,7 @@
-package com.esevinale.myappportfolio.ui.MovieScreen;
+package com.esevinale.myappportfolio.ui.MovieListScreen;
 
+
+import com.esevinale.myappportfolio.models.MovieItem;
 
 public interface MovieListPresenter {
 
@@ -11,4 +13,5 @@ public interface MovieListPresenter {
     void loadNext(int page);
     void loadRefresh();
     void onOptionItemSelected(byte loadType);
+    void onMovieClicked(MovieItem movieItem);
 }

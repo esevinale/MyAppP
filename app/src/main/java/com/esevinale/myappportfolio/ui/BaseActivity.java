@@ -2,6 +2,7 @@ package com.esevinale.myappportfolio.ui;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -19,8 +20,6 @@ import butterknife.ButterKnife;
 
 public abstract class BaseActivity extends MvpAppCompatActivity{
 
-    @Inject
-    MyFragmentManager myFragmentManager;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.progress_bar)
@@ -60,23 +59,9 @@ public abstract class BaseActivity extends MvpAppCompatActivity{
     }
 
     public void setContent(BaseFragment fragment) {
-        myFragmentManager.setFragment(this, fragment, R.id.main_wrapper);
-    }
-
-    public void addContect(BaseFragment fragment) {
-        myFragmentManager.addFragment(this, fragment, R.id.main_wrapper);
-    }
-
-    public boolean removeCurrentFragment() {
-        return myFragmentManager.removeCurrentFragment(this);
-    }
-
-    public boolean removeFragment(BaseFragment fragment) {
-        return myFragmentManager.removeFragment(this, fragment);
-    }
-
-    @Override
-    public void onBackPressed() {
-        removeCurrentFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.main_wrapper, fragment);
+        fragmentTransaction.commit();
+        fragmentOnScreen(fragment);
     }
 }

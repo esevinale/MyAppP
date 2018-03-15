@@ -1,4 +1,4 @@
-package com.esevinale.myappportfolio.ui.MovieScreen;
+package com.esevinale.myappportfolio.ui.MovieListScreen;
 
 
 import android.content.Intent;
@@ -16,9 +16,11 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.esevinale.myappportfolio.R;
-import com.esevinale.myappportfolio.api.TmdbService;
 import com.esevinale.myappportfolio.application.AppController;
+import com.esevinale.myappportfolio.application.builder.MovieListComponent;
+import com.esevinale.myappportfolio.application.builder.MovieListModule;
 import com.esevinale.myappportfolio.models.MovieItem;
 import com.esevinale.myappportfolio.ui.BaseFragment;
 import com.esevinale.myappportfolio.ui.MovieDetailsScreen.MovieDetailsActivity;
@@ -27,16 +29,11 @@ import com.esevinale.myappportfolio.utils.manager.MyGridLayoutManager;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class MovieListFragment extends BaseFragment implements MovieListView {
-
-    @Inject
-    TmdbService tmdbService;
 
     @BindView(R.id.rv_movie)
     RecyclerView mRecyclerView;
@@ -48,8 +45,14 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
     @InjectPresenter
     MovieListPresenterImpl movieListPresenter;
 
-    MovieListAdapter movieListAdapter;
+    @ProvidePresenter
+    MovieListPresenterImpl providePresenter() {
+        return movieListComponent.providePresenter();
+    }
+
+    private MovieListAdapter movieListAdapter;
     private Unbinder unbinder;
+    private MovieListComponent movieListComponent;
 
     public MovieListFragment() {
         // Required empty public constructor
@@ -58,8 +61,8 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        movieListComponent = AppController.getAppComponent().createMovieListComponent(new MovieListModule());
         super.onCreate(savedInstanceState);
-        AppController.getAppComponent().inject(this);
         setHasOptionsMenu(true);
     }
 
@@ -135,7 +138,7 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
 
     @Override
     public void showRefreshing() {
-
+        mSwipe.setRefreshing(true);
     }
 
     @Override
@@ -154,8 +157,8 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
     }
 
     @Override
-    public void showError(String message) {
-        Toast.makeText(getBaseActivity(), message, Toast.LENGTH_LONG).show();
+    public void showError() {
+        Toast.makeText(getBaseActivity(), getString(R.string.loadingError), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -170,6 +173,11 @@ public class MovieListFragment extends BaseFragment implements MovieListView {
 
     @Override
     public void onMovieClicked(MovieItem movie) {
+        movieListPresenter.onMovieClicked(movie);
+    }
+
+    @Override
+    public void startMovieDetails(MovieItem movie) {
         Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
         Bundle extras = new Bundle();
         extras.putParcelable(Constants.MOVIE_ITEM, movie);

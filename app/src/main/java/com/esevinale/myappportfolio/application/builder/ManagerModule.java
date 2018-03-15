@@ -16,12 +16,6 @@ public class ManagerModule {
 
     @Singleton
     @Provides
-    MyFragmentManager provideMyFragmentManager() {
-        return new MyFragmentManager();
-    }
-
-    @Singleton
-    @Provides
     NetworkManager provideNetworkManager() {
         return new NetworkManager();
     }

@@ -16,4 +16,5 @@
     <string name="action_sort_latest">Latest</string>
     <string name="action_sort_upcoming">Upcoming</string>
     <string name="action_sort">Filter</string>
+    <string name="loadingError">Loading Error!</string>
 </resources>

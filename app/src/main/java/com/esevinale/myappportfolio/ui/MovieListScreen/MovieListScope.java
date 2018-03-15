@@ -1,4 +1,4 @@
-package com.esevinale.myappportfolio.ui.MovieScreen;
+package com.esevinale.myappportfolio.ui.MovieListScreen;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

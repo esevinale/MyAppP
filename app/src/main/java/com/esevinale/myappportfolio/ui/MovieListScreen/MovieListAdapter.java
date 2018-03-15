@@ -1,4 +1,4 @@
-package com.esevinale.myappportfolio.ui.MovieScreen;
+package com.esevinale.myappportfolio.ui.MovieListScreen;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

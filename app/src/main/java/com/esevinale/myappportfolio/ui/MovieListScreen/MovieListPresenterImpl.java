@@ -1,18 +1,17 @@
-package com.esevinale.myappportfolio.ui.MovieScreen;
+package com.esevinale.myappportfolio.ui.MovieListScreen;
 
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
-import com.esevinale.myappportfolio.application.AppController;
-import com.esevinale.myappportfolio.application.builder.MovieListModule;
 import com.esevinale.myappportfolio.models.MovieItem;
+import com.esevinale.myappportfolio.repository.MovieContentInteractor;
+import com.esevinale.myappportfolio.MyIdlingResources;
 import com.esevinale.myappportfolio.utils.Constants;
 import com.esevinale.myappportfolio.utils.manager.MyPreferencesManager;
 import com.esevinale.myappportfolio.utils.manager.NetworkManager;
 
+import java.io.IOException;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,22 +21,23 @@ import io.reactivex.schedulers.Schedulers;
 public class MovieListPresenterImpl extends MvpPresenter<MovieListView> implements MovieListPresenter {
 
 
-    @Inject
-    MovieContentInteractorImpl movieContentInteractor;
+    private MovieContentInteractor movieContentInteractor;
 
-    @Inject
-    NetworkManager networkManager;
+    private NetworkManager networkManager;
 
-    @Inject
-    MyPreferencesManager preferencesManager;
+    private MyPreferencesManager preferencesManager;
 
+    private MyIdlingResources resources;
     private boolean mIsInLoading;
 
-    static byte loadType;
+    private static byte loadType;
 
-    MovieListPresenterImpl() {
-        AppController.getAppComponent().createMovieListComponent(new MovieListModule()).inject(this);
+    public MovieListPresenterImpl(MovieContentInteractor movieContentInteractor, NetworkManager networkManager, MyPreferencesManager preferencesManager, MyIdlingResources resources) {
+        this.movieContentInteractor = movieContentInteractor;
+        this.networkManager = networkManager;
+        this.preferencesManager = preferencesManager;
         loadType = (byte) preferencesManager.getSelectedOption();
+        this.resources = resources;
     }
 
     private void loadData(ProgressType progressType, int page) {
@@ -45,25 +45,27 @@ public class MovieListPresenterImpl extends MvpPresenter<MovieListView> implemen
             return;
         }
         mIsInLoading = true;
-
+        resources.loadStart();
         networkManager.getNetworkObservable(Constants.TMDB)
                 .flatMap(aBoolean -> {
                     if (!aBoolean && page > 1) {
-                        return Observable.empty();
+                        return Observable.error(new IOException("No Connection"));
                     }
                     return aBoolean
-                            ? movieContentInteractor.loadData(page)
+                            ? movieContentInteractor.loadData(page, loadType)
                             : movieContentInteractor.restoreData(loadType);
 
                 })
 
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> onLoadingStart(progressType))
-                .doFinally(() -> onLoadingFinish(progressType))
+                .doOnSubscribe(disposable -> showProgress(progressType))
+                .doFinally(() -> {
+                    hideProgress(progressType);
+                    resources.loadFinish();
+                })
                 .subscribe(movies -> onLoadingSuccess(progressType, movies), error -> {
-                    error.printStackTrace();
-                    onLoadingFailed(error);
+                    onLoadingFailed();
                 });
     }
 
@@ -80,27 +82,6 @@ public class MovieListPresenterImpl extends MvpPresenter<MovieListView> implemen
     }
 
 
-    private void onLoadingStart(ProgressType progressType) {
-        showProgress(progressType);
-    }
-
-    private void onLoadingFinish(ProgressType progressType) {
-        mIsInLoading = false;
-        hideProgress(progressType);
-    }
-
-    private void onLoadingFailed(Throwable throwable) {
-        getViewState().showError(throwable.getMessage());
-    }
-
-    private void onLoadingSuccess(ProgressType progressType, List<MovieItem> items) {
-        if (progressType == ProgressType.Paging) {
-            getViewState().addMovies(items);
-        } else {
-            getViewState().setMovies(items);
-        }
-    }
-
     private void showProgress(ProgressType progressType) {
         switch (progressType) {
             case Refreshing:
@@ -113,6 +94,7 @@ public class MovieListPresenterImpl extends MvpPresenter<MovieListView> implemen
     }
 
     private void hideProgress(ProgressType progressType) {
+        mIsInLoading = false;
         switch (progressType) {
             case Refreshing:
                 getViewState().hideRefreshing();
@@ -123,9 +105,26 @@ public class MovieListPresenterImpl extends MvpPresenter<MovieListView> implemen
         }
     }
 
+    private void onLoadingFailed() {
+        getViewState().showError();
+    }
+
+    private void onLoadingSuccess(ProgressType progressType, List<MovieItem> items) {
+        if (progressType == ProgressType.Paging) {
+            getViewState().addMovies(items);
+        } else {
+            getViewState().setMovies(items);
+        }
+    }
+
     public void onOptionItemSelected(byte loadType) {
         MovieListPresenterImpl.loadType = loadType;
         preferencesManager.setSelectedOption(loadType);
         loadStart();
+    }
+
+    @Override
+    public void onMovieClicked(MovieItem movieItem) {
+        getViewState().startMovieDetails(movieItem);
     }
 }
